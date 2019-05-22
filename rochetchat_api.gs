@@ -2,7 +2,7 @@ var username = PropertiesService.getScriptProperties().getProperty('USERNAME');
 var password = PropertiesService.getScriptProperties().getProperty('PASSWORD');
 var chat = PropertiesService.getScriptProperties().getProperty('CHAT_URL');
 
-// ロケットチャットにログイン
+// login to rocketchat
 function login_rocketchat() {
   var URL = chat+"/api/v1/login";
   var postData = {
@@ -25,7 +25,7 @@ function login_rocketchat() {
   return [authToken, userId];
 }
 
-// チャンネルIDを取得
+// get channnel ID
 function get_channel_id(channel){
   var [authToken, userId] = login_rocketchat();
   var URL = chat + "/api/v1/channels.info?roomName=" + channel;
@@ -42,7 +42,7 @@ function get_channel_id(channel){
   return content['channel']['_id'];
 }
 
-// 指定チャンネルにメッセージを送信
+// send message to specified channel
 function post_message(channel, text) {
   var [authToken, userId] = login_rocketchat();
   var URL = chat + "/api/v1/chat.postMessage";
@@ -63,7 +63,7 @@ function post_message(channel, text) {
   UrlFetchApp.fetch(URL, options);
 }
 
-// 指定チャンネルにファイルを送信
+// send file to specified channel
 function post_file(channel, file) {
   var [authToken, userId] = login_rocketchat();
   var URL = chat + "/api/v1/rooms.upload/" + get_channel_id(channel);
@@ -87,6 +87,7 @@ function post_file(channel, file) {
   UrlFetchApp.fetch(URL, options);
 }
 
+// get specified channel history
 function get_channel_history(channel){
   var [authToken, userId] = login_rocketchat();
   var URL = chat + "/api/v1/channels.history?roomId=" + get_channel_id(channel);
@@ -104,6 +105,7 @@ function get_channel_history(channel){
   return content['messages']
 }
 
+// delete message
 function delete_message(channel, message_id){
   var [authToken, userId] = login_rocketchat();
   var URL = chat + "/api/v1/chat.delete";
@@ -124,6 +126,7 @@ function delete_message(channel, message_id){
   UrlFetchApp.fetch(URL, options);
 }
 
+// delete latest message
 function delete_latest_message(channel){
   messages = get_channel_history(channel);
   messages.some(function(message) {
@@ -133,9 +136,4 @@ function delete_latest_message(channel){
       return true;
     }
   });
-}
-
-function main(){
-  var channel = "api-test-channel";
-  delete_latest_message(channel);
 }
